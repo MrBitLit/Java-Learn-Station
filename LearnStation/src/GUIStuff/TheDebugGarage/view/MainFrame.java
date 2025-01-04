@@ -1,5 +1,6 @@
 package GUIStuff.TheDebugGarage.view;
 
+import GUIStuff.TheDebugGarage.enums.Brand;
 import GUIStuff.TheDebugGarage.enums.FuelType;
 import GUIStuff.TheDebugGarage.enums.GearType;
 import GUIStuff.TheDebugGarage.model.Car;
@@ -14,6 +15,7 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
@@ -111,30 +113,68 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void initVehicles() {
         vehicles.addVehicle(new Car("CA 1234", Color.BLACK,
-                "Audi", "A5 Coupe", 54000.99, 43200,
+                Brand.AUDI, Brand.AUDI.getModels()[0], 54000.99,
+                43200,
                 LocalDate.of(2017, Month.AUGUST, 5),
-                GearType.AUTOMATIC, null, FuelType.PETROL));
+                GearType.AUTOMATIC,
+                customers.getCustomer(0), FuelType.PETROL));
 
         vehicles.addVehicle(new Car("NY 4321", Color.BLUE,
-                "Tesla", "Model 3", 49999.50, 45000,
+                Brand.TESLA, Brand.TESLA.getModels()[1], 49999.50,
+                45000,
                 LocalDate.of(2020, Month.JULY, 22),
-                GearType.AUTOMATIC, null, FuelType.ELECTRIC));
+                GearType.AUTOMATIC,
+                customers.getCustomer(1), FuelType.ELECTRIC));
 
         vehicles.addVehicle(new Car("SF 9876", Color.RED,
-                "Ford", "Mustang GT", 55000.75, 32000,
+                Brand.HONDA, Brand.HONDA.getModels()[2], 55000.75,
+                32000,
                 LocalDate.of(2019, Month.FEBRUARY, 18),
-                GearType.MANUAL, null, FuelType.PETROL));
+                GearType.MANUAL,
+                customers.getCustomer(2), FuelType.PETROL));
 
         vehicles.addVehicle(new Car("LA 6543", Color.WHITE,
-                "Mercedes", "C-Class", 43000.10, 28000,
+                Brand.MERCEDES, Brand.MERCEDES.getModels()[1],
+                43000.10, 28000,
                 LocalDate.of(2021, Month.JUNE, 10),
                 GearType.AUTOMATIC, null, FuelType.DIESEL));
     }
 
     private void updateView() {
+
         customersList.setListData(customers.toArray());
 
         vehiclesList.setListData(vehicles.toArray());
+
+        customerComboBox.setModel(new DefaultComboBoxModel(
+                customers.getAllMatricules()));
+
+        gearTypeComboBox.setModel(new DefaultComboBoxModel(GearType.
+                values()));
+
+        fuelTypeComboBox.setModel(new DefaultComboBoxModel(FuelType.
+                values()));
+
+        brandComboBox.setModel(new DefaultComboBoxModel(Brand.
+                values()));
+        Brand selectedBrand = (Brand) brandComboBox.getSelectedItem();
+        carModelComboBox.setModel(new DefaultComboBoxModel(
+                selectedBrand.getModels()));
+    }
+
+    // Convert string value to LocalDate format "2024-02-14"
+    private LocalDate stringToLocalDate(String dateStringValue) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(
+                "yyyy-MM-dd");
+
+        try {
+            return LocalDate.parse(dateStringValue,
+                    formatter);
+
+        } catch (DateTimeParseException e) {
+            System.out.println(e);
+            return null;
+        }
     }
 
     /**
@@ -283,7 +323,7 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
-        customerLabel.setText("Customer: ");
+        customerLabel.setText("Owner:");
 
         customerComboBox.setEditable(true);
         customerComboBox.addActionListener(new java.awt.event.ActionListener() {
@@ -644,7 +684,14 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_carKmRangeTextFieldActionPerformed
 
     private void brandComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_brandComboBoxActionPerformed
+        Brand selectedBrand = (Brand) brandComboBox.getSelectedItem();
 
+        if (selectedBrand == null) {
+            return;
+        }
+
+        carModelComboBox.setModel(new DefaultComboBoxModel(
+                selectedBrand.getModels()));
     }//GEN-LAST:event_brandComboBoxActionPerformed
 
     private void carModelComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_carModelComboBoxActionPerformed
@@ -672,37 +719,40 @@ public class MainFrame extends javax.swing.JFrame {
             String licensePlateValue = licensePlateTextField.getText();
             Integer carKmRangeValue = Integer.valueOf(
                     carKmRangeTextField.getText());
-            String brandValue = (String) brandComboBox.getSelectedItem();
+            Brand brandValue = (Brand) brandComboBox.getSelectedItem();
             String carModelValue = (String) carModelComboBox.getSelectedItem();
             Double carPriceValue = Double.valueOf(carPriceTextField.getText());
             String carBuildDateValue = (String) carBuildDateTextField.getText();
             GearType gearTypeValue = (GearType) gearTypeComboBox.
                     getSelectedItem();
-            Customer ownerValue = (Customer) customerComboBox.
-                    getSelectedItem();
+            Customer ownerValue = (Customer) customers.getCustomerByMatricule(
+                    (String) customerComboBox.getSelectedItem());
 
-            LocalDate carBuildDate = null;
-
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(
-                    "yyyy-MM-dd");
-
-            try {
-                carBuildDate = LocalDate.parse(carBuildDateValue,
-                        formatter);
-
-            } catch (DateTimeParseException e) {
-                System.out.println(e);
+            if (licensePlateValue.isBlank()
+                    || brandValue == null || carModelValue.isBlank()
+                    || carBuildDateValue.isBlank() || gearTypeValue
+                    == null || ownerValue == null) {
+                JOptionPane.showMessageDialog(this,
+                        "Please fill out the car details!",
+                        "Car input validation failed",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
             }
 
             Vehicle newVehicle = new Car(licensePlateValue,
                     Color.yellow, brandValue, carModelValue,
-                    carPriceValue, carKmRangeValue, carBuildDate,
+                    carPriceValue, carKmRangeValue,
+                    stringToLocalDate(carBuildDateValue),
                     gearTypeValue, ownerValue,
                     FuelType.PETROL);
 
             vehicles.addVehicle(newVehicle);
         } catch (NumberFormatException ex) {
-            System.out.println(ex);
+            JOptionPane.showMessageDialog(this,
+                    "Only numeric values are allowed for km range and "
+                    + "price!",
+                    "Car input validation failed",
+                    JOptionPane.ERROR_MESSAGE);
         }
 
         updateView();
@@ -714,21 +764,9 @@ public class MainFrame extends javax.swing.JFrame {
         String matriculeValue = matriculeTextField.getText();
         String birthDateValue = birthDateTextField.getText();
 
-        LocalDate birthDate = null;
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(
-                "yyyy-MM-dd");
-
-        try {
-            birthDate = LocalDate.parse(birthDateValue,
-                    formatter);
-
-        } catch (DateTimeParseException e) {
-            System.out.println(e);
-        }
-
         Customer newCustomer = new Customer(firstNameValue,
-                lastNameValue, matriculeValue, birthDate,
+                lastNameValue, matriculeValue,
+                stringToLocalDate(birthDateValue),
                 null, null);
 
         customers.addCustomer(newCustomer);
@@ -753,25 +791,22 @@ public class MainFrame extends javax.swing.JFrame {
             String matriculeValue = matriculeTextField.getText();
             String birthDateValue = birthDateTextField.getText();
 
-            LocalDate birthDate = null;
-
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(
-                    "yyyy-MM-dd");
-
-            try {
-                birthDate = LocalDate.parse(birthDateValue,
-                        formatter);
-
-            } catch (DateTimeParseException e) {
-                System.out.println(e);
+            if (firstNameValue.isBlank() || lastNameValue.isBlank()
+                    || matriculeValue.isBlank() || birthDateValue.isBlank()) {
+                JOptionPane.showMessageDialog(this,
+                        "Please fill out the customer details!",
+                        "Customer input validation failed",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
             }
 
             Customer newCustomer = new Customer(firstNameValue,
-                    lastNameValue, matriculeValue, birthDate,
+                    lastNameValue, matriculeValue,
+                    stringToLocalDate(birthDateValue),
                     null, null);
 
             customers.addCustomer(newCustomer);
-        } catch (NumberFormatException ex) {
+        } catch (Exception ex) {
             System.out.println(ex);
         }
 
@@ -784,6 +819,8 @@ public class MainFrame extends javax.swing.JFrame {
         if (selectedIndex != -1) {
             Vehicle selectedVehicle = vehicles.getVehicle(
                     selectedIndex);
+            Customer selectedCustomer = selectedVehicle.getOwner();
+
             licensePlateTextField.setText(String.valueOf(
                     selectedVehicle.getLicensePlate()));
             carKmRangeTextField.setText(String.valueOf(
@@ -798,8 +835,9 @@ public class MainFrame extends javax.swing.JFrame {
                     selectedVehicle.getCarBuildDate()));
             gearTypeComboBox.setSelectedItem(
                     selectedVehicle.getGearType());
-            customerComboBox.setSelectedItem(
-                    selectedVehicle.getOwner());
+            customerComboBox.setSelectedItem(selectedCustomer != null
+                    ? selectedCustomer.getMatriculeNumber() : null
+            );
         } else {
             licensePlateTextField.setText("");
             carKmRangeTextField.setText("0");
@@ -856,8 +894,9 @@ public class MainFrame extends javax.swing.JFrame {
         if (selectedIndex != -1) {
             Vehicle selectedVehicle = vehicles.getVehicle(selectedIndex);
 
-            selectedVehicle.setBrand((String) brandComboBox.getSelectedItem());
-//            selectedVehicle.setCarBuildDate(carBuildDateLabel.getText());
+            selectedVehicle.setBrand((Brand) brandComboBox.getSelectedItem());
+            selectedVehicle.setCarBuildDate(stringToLocalDate(
+                    carBuildDateTextField.getText()));
 //            selectedVehicle.setColor(newVehicle.getColor());
             selectedVehicle.setFuelType((FuelType) fuelTypeComboBox.
                     getSelectedItem());
@@ -870,8 +909,8 @@ public class MainFrame extends javax.swing.JFrame {
                     getText());
             selectedVehicle.setModel((String) carModelComboBox.
                     getSelectedItem());
-            selectedVehicle.setOwner((Customer) customerComboBox.
-                    getSelectedItem());
+            selectedVehicle.setOwner(customers.getCustomerByMatricule(
+                    (String) customerComboBox.getSelectedItem()));
             selectedVehicle.setPrice(Double.valueOf(carPriceTextField.
                     getText()));
 
@@ -889,11 +928,43 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_fuelTypeComboBoxActionPerformed
 
     private void modifyCustomerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_modifyCustomerButtonActionPerformed
+        int selectedIndex = customersList.getSelectedIndex();
 
+        // update if a customer is already set
+        if (selectedIndex != -1) {
+            Customer selectedCustomer = customers.getCustomer(
+                    selectedIndex);
+
+            selectedCustomer.setFirstName(firstNameTextField.
+                    getText());
+            selectedCustomer.setLastName(lastNameTextField.getText());
+            selectedCustomer.setMatriculeNumber(
+                    matriculeTextField.getText());
+            selectedCustomer.setBirthDate(
+                    stringToLocalDate(
+                            birthDateTextField.getText()));
+
+            updateView();
+        } else {
+            JOptionPane.showMessageDialog(this,
+                    "Please select a customer!",
+                    "No selected customer",
+                    JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_modifyCustomerButtonActionPerformed
 
     private void removeCustomerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeCustomerButtonActionPerformed
+        int selectedIndex = customersList.getSelectedIndex();
 
+        if (selectedIndex != -1) {
+            customers.removeCustomer(selectedIndex);
+            updateView();
+        } else {
+            JOptionPane.showMessageDialog(this,
+                    "Please select a customer!",
+                    "No selected customer",
+                    JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_removeCustomerButtonActionPerformed
 
     /**

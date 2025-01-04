@@ -1,5 +1,6 @@
 package GUIStuff.TheDebugGarage.model.abstracts;
 
+import GUIStuff.TheDebugGarage.enums.Brand;
 import GUIStuff.TheDebugGarage.enums.FuelType;
 import GUIStuff.TheDebugGarage.enums.GearType;
 import GUIStuff.TheDebugGarage.model.Customer;
@@ -14,7 +15,7 @@ public abstract class Vehicle {
 
     public String licensePlate;
     public Color color;
-    public String brand;
+    public Brand brand;
     public String model;
     public Double price;
     public Integer kmRange;
@@ -23,7 +24,7 @@ public abstract class Vehicle {
     public Customer owner;
     public FuelType fuelType;
 
-    public Vehicle(String licensePlate, Color color, String brand,
+    public Vehicle(String licensePlate, Color color, Brand brand,
             String model, Double price, Integer kmRange,
             LocalDate carBuildDate, GearType gearType,
             Customer owner, FuelType fuelType) {
@@ -55,11 +56,11 @@ public abstract class Vehicle {
         this.color = color;
     }
 
-    public String getBrand() {
+    public Brand getBrand() {
         return brand;
     }
 
-    public void setBrand(String brand) {
+    public void setBrand(Brand brand) {
         this.brand = brand;
     }
 

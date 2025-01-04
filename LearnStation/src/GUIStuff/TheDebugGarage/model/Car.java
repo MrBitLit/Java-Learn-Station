@@ -1,5 +1,6 @@
 package GUIStuff.TheDebugGarage.model;
 
+import GUIStuff.TheDebugGarage.enums.Brand;
 import GUIStuff.TheDebugGarage.enums.FuelType;
 import GUIStuff.TheDebugGarage.enums.GearType;
 import GUIStuff.TheDebugGarage.model.abstracts.Vehicle;
@@ -12,7 +13,7 @@ import java.time.LocalDate;
  */
 public class Car extends Vehicle {
 
-    public Car(String licensePlate, Color color, String brand,
+    public Car(String licensePlate, Color color, Brand brand,
             String model, Double price, Integer kmRange,
             LocalDate carBuildDate, GearType gearType,
             Customer owner, FuelType fuelType) {

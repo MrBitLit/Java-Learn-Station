@@ -7,6 +7,7 @@ import java.util.ArrayList;
  * @author besic
  */
 public class Customers {
+
     private static ArrayList<Customer> alCustomers = new ArrayList<>();
 
     public int getCustomerListSize() {
@@ -15,6 +16,28 @@ public class Customers {
 
     public Object[] toArray() {
         return alCustomers.toArray();
+    }
+
+    public Object[] getAllMatricules() {
+        ArrayList<String> alMatricules = new ArrayList<>();
+
+        alCustomers.forEach((customer) -> {
+            alMatricules.add(customer.getMatriculeNumber());
+        });
+
+        return alMatricules.toArray();
+
+        /* return alCustomers.stream().map(Customer::getMatriculeNumber).
+          toArray(String[]::new); */
+    }
+
+    public Customer getCustomerByMatricule(String matricule) {
+        for (Customer customer : alCustomers) {
+            if (customer.getMatriculeNumber().equals(matricule)) {
+                return customer;
+            }
+        }
+        return null;
     }
 
     public Customer getCustomer(int index) {
