@@ -747,7 +747,35 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_birthDateTextFieldActionPerformed
 
     private void addCustomerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addCustomerButtonActionPerformed
+        try {
+            String firstNameValue = firstNameTextField.getText();
+            String lastNameValue = lastNameTextField.getText();
+            String matriculeValue = matriculeTextField.getText();
+            String birthDateValue = birthDateTextField.getText();
 
+            LocalDate birthDate = null;
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(
+                    "yyyy-MM-dd");
+
+            try {
+                birthDate = LocalDate.parse(birthDateValue,
+                        formatter);
+
+            } catch (DateTimeParseException e) {
+                System.out.println(e);
+            }
+
+            Customer newCustomer = new Customer(firstNameValue,
+                    lastNameValue, matriculeValue, birthDate,
+                    null, null);
+
+            customers.addCustomer(newCustomer);
+        } catch (NumberFormatException ex) {
+            System.out.println(ex);
+        }
+
+        updateView();
     }//GEN-LAST:event_addCustomerButtonActionPerformed
 
     private void vehiclesListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_vehiclesListValueChanged
